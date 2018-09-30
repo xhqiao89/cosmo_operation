@@ -1,0 +1,17 @@
+pipeline {
+    agent none
+    stages {
+        stage('Build') {
+            agent {
+                docker {
+                    image 'zhiyuli/rapid:1.1'
+                    args '-v /home/drew/Documents/cosmo_project:/mnt_cosmo_project -v /mnt/storage/cosmo:/mnt_lsm'
+                }
+            }
+            steps {
+                sh 'cd /root/RAPIDpy && git pull && python setup.py install'
+                sh 'cd /mnt_cosmo_project && python run_cosmo_operation.py'
+            }
+        }
+    }
+}
