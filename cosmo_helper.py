@@ -15,12 +15,13 @@ class OperationHelperForCOSMO(object):
     lsm_source_path = "/mnt_lsm"
     template_path = "/mnt_cosmo_project/template"
     target_path = "/mnt_cosmo_project/run"
+    lsm_symlink = False
 
     def __init__(self, lsm_source_path, input_path, workspace_path, **kwargs):
         self.lsm_source_path = lsm_source_path
         self.template_path = input_path
         self.target_path = workspace_path
-        for k,v in kwargs:
+        for k, v in kwargs.iteritems():
             setattr(self, k, v)
 
 
@@ -31,7 +32,7 @@ class OperationHelperForCOSMO(object):
             print("Folder already exists at {}".format(path))
 
 
-    def _copy_lsm(self, lsm_source_path, target_path, model_dt, symlink=False):
+    def _copy_lsm(self, lsm_source_path, target_path, model_dt):
         print("Copying LSM....")
         fn_format = "PLATANC_{model_dt}_{forecast_dt}.nc"
 
@@ -44,16 +45,23 @@ class OperationHelperForCOSMO(object):
             source_file_path = os.path.join(lsm_source_path, current_frst_fn)
             target_file_path = os.path.join(target_path, current_frst_fn)
 
-            # if symlink:
-            #     if not (os.path.islink(target_file_path) and os.path.getsize(source_file_path) == os.path.getsize(target_file_path)):
-            #         os.symlink(source_file_path, target_file_path)
-            # else:
-            if not(os.path.isfile(target_file_path) and os.path.getsize(source_file_path) == os.path.getsize(target_file_path)):
-                shutil.copyfile(source_file_path, target_file_path)
-                #print("Copying to {}".format(target_file_path))
+            if self.lsm_symlink:
+                if os.path.isfile(target_file_path):
+                    if not (os.path.islink(target_file_path)):
+                        os.remove(target_file_path)
+                    else:
+                        os.unlink(target_file_path)
+                if os.path.isfile(source_file_path):
+                    os.symlink(source_file_path, target_file_path)
+                else:
+                    raise Exception("Missing file: {}".format(source_file_path))
             else:
-                #print("File already exists at {}".format(target_file_path))
-                pass
+                if not(os.path.isfile(target_file_path) and os.path.getsize(source_file_path) == os.path.getsize(target_file_path)):
+                    shutil.copyfile(source_file_path, target_file_path)
+                    #print("Copying to {}".format(target_file_path))
+                else:
+                    #print("File already exists at {}".format(target_file_path))
+                    pass
         print("********LSM ready for {}".format(model_dt))
 
 

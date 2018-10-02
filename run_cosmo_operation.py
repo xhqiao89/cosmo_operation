@@ -9,7 +9,7 @@ workspace_path = "/mnt_cosmo_project/run"
 
 if __name__ == "__main__":
 
-    cosmo_helper = OperationHelperForCOSMO(lsm_source_path, input_folder_path, workspace_path)
+    cosmo_helper = OperationHelperForCOSMO(lsm_source_path, input_folder_path, workspace_path, lsm_symlink=True)
 
     # current_utc_dt_str = sys.argv[1]
     # print (current_utc_dt_str)
