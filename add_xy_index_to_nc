@@ -1,0 +1,25 @@
+import netCDF4
+
+ylat_num = 481  # Y or rows
+xlon_num = 561  # X or colums
+
+in_nc_file = r"C:\Users\Drew\Desktop\PLATANC_2018110600_2018111305_new.nc"
+with netCDF4.Dataset(in_nc_file, mode='r+') as in_nc:
+    # create a new empty var lon_index(time, rlat, rlon)
+    xlon_index = in_nc.createVariable("xlon_index", "i4", ("time", "rlat", "rlon"))
+    # create a matrix (2d array) ylat_num(481) rows * xlon_num(561) columns
+    # each row is [0, 1, .... 560(xlon_num -1)]
+    xlon_index_value_matrix = [range(xlon_num) for i in range(ylat_num)]
+    xlon_index[0] = xlon_index_value_matrix
+
+    # create a new empty var lat_index(time, rlat, rlon)
+    ylat_index = in_nc.createVariable("ylat_index", "i4", ("time", "rlat", "rlon"))
+    # create a matrix (2d array) ylat_num(481) rows * lon_num(561) columns
+    # 1st row is [0, 0, .... 0]
+    # 2nd row is [1, 1, .....1]
+    #...
+    # last row (481th) is [480, 480, ....., 480]
+    ylat_index_value_matrix = [[i] * xlon_num for i in range(ylat_num)]
+    ylat_index[0] = ylat_index_value_matrix
+
+print("done")
